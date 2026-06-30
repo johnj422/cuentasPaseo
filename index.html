@@ -208,6 +208,42 @@
   .badge.debe{background:var(--coral-soft);color:var(--coral);}
   .badge.favor{background:var(--green-soft);color:var(--green);}
 
+  /* ===== COMPOSITION ACCORDION ===== */
+  .acc-item{border-bottom:1px solid var(--line);}
+  .acc-item:last-child{border-bottom:none;}
+  .acc-head{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;padding:13px 12px;cursor:pointer;
+  }
+  .acc-head:active{background:var(--lavender);border-radius:12px;}
+  .acc-left{display:flex;align-items:center;gap:12px;min-width:0;}
+  .acc-icon{
+    width:38px;height:38px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:#fff;
+  }
+  .acc-nm{font-size:13.5px;font-weight:700;}
+  .acc-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .acc-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .acc-total{font-size:13.5px;font-weight:700;}
+  .acc-chevron{font-size:12px;color:var(--text-muted);transition:transform .3s ease;}
+  .acc-item.open .acc-chevron{transform:rotate(180deg);}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .acc-item.open .acc-body{max-height:320px;}
+  .acc-body-inner{padding:2px 12px 14px 62px;}
+  .acc-line{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:12.5px;padding:7px 0;border-bottom:1px dashed var(--line);
+  }
+  .acc-line:last-child{border-bottom:none;}
+  .acc-line .lbl{color:var(--text-dark);}
+  .acc-line .lbl .star{color:var(--text-muted);}
+  .acc-line .amt{font-family:'Manrope',sans-serif;font-weight:600;}
+  .acc-caption{
+    font-size:10.5px;color:var(--text-muted);
+    padding:10px 6px 0;font-style:italic;
+  }
+
   /* ===== NOTES ===== */
   .notes-card{
     font-size:12px;color:var(--text-muted);line-height:1.6;
@@ -354,6 +390,12 @@
       </div>
     </div>
 
+    <div class="section" id="composicion">
+      <div class="section-title"><h2>Qué compone cada rubro</h2></div>
+      <div class="card fam-card" id="accList"></div>
+      <div class="acc-caption">* la hoja original no incluye descripción para estos montos, solo el valor</div>
+    </div>
+
     <div class="section" id="familias">
       <div class="section-title"><h2>Familias</h2><span class="more">toca para ver el detalle</span></div>
       <div class="card fam-card" id="famList"></div>
@@ -409,6 +451,71 @@ const familias = [
     saldo:-1718913
   },
 ];
+
+const composicion = [
+  {
+    nombre:"Comida 1", total:1225560, icon:"🥩", color1:"#4F46E5", color2:"#7B74F2",
+    items:[
+      ["Carne","473.372",false],
+      ["Mercado 2","189.700",false],
+      ["Mercado 1 (sin trago)","309.420",false],
+      ["Frutas","185.348",false],
+      ["Mercado 3","55.720",false],
+      ["Tienda","12.000",false],
+    ]
+  },
+  {
+    nombre:"Comida 2", total:200000, icon:"🍽️", color1:"#0EA5A4", color2:"#34D2C8",
+    items:[
+      ["Almuerzo (lunes)","150.000",false],
+      ["Agua Kike","50.000",false],
+    ]
+  },
+  {
+    nombre:"Trago 1", total:401800, icon:"🍷", color1:"#F0573D", color2:"#F2926D",
+    items:[
+      ["Ginebra","89.900",false],
+      ["Antioqueño","106.300",false],
+      ["Amarillo","105.600",false],
+      ["Cervezas","100.000",false],
+    ]
+  },
+  {
+    nombre:"Trago 2", total:350000, icon:"🍺", color1:"#C98A2E", color2:"#E0AC5D",
+    items:[
+      ["Tequila","300.000",false],
+      ["Hielo Caro S","50.000",true],
+    ]
+  },
+];
+
+const accList = document.getElementById("accList");
+composicion.forEach((c,i)=>{
+  const item = document.createElement("div");
+  item.className = "acc-item";
+  item.innerHTML = `
+    <div class="acc-head">
+      <div class="acc-left">
+        <div class="acc-icon" style="background:linear-gradient(135deg,${c.color1},${c.color2});">${c.icon}</div>
+        <div>
+          <div class="acc-nm">${c.nombre}</div>
+          <div class="acc-sub">${c.items.length} ${c.items.length===1?'ítem':'ítems'}</div>
+        </div>
+      </div>
+      <div class="acc-right">
+        <div class="acc-total">$${c.total.toLocaleString("es-CO")}</div>
+        <span class="acc-chevron">▾</span>
+      </div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-body-inner">
+        ${c.items.map(it=>`<div class="acc-line"><span class="lbl">${it[0]}${it[2]?' <span class="star">*</span>':''}</span><span class="amt">$${it[1]}</span></div>`).join("")}
+      </div>
+    </div>
+  `;
+  item.querySelector(".acc-head").addEventListener("click",()=>item.classList.toggle("open"));
+  accList.appendChild(item);
+});
 
 const fmt = n => "$" + Math.round(Math.abs(n)).toLocaleString("es-CO");
 
